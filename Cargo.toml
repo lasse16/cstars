@@ -2,7 +2,9 @@
 name = "cstars"
 version = "0.1.0"
 edition = "2021"
+authors = ["Lasse Haffke <lasse@haffke.me>"]
 
+description = "Interact with Advent of Code from the command-line"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
