@@ -21,16 +21,13 @@ pub fn submit_solution_for_date(
     Ok(response.text()?)
 }
 fn build_input_url(date: Date) -> String {
-    return format!(
-        "{ADVENT_OF_CODE_URL_BASE}/{}/day/{}/input",
-        date.year, date.day
-    );
+    return format!("{}/input", build_date_url(date));
 }
 
 fn build_answer_url(date: Date) -> String {
-    return format!(
-        "{ADVENT_OF_CODE_URL_BASE}/{}/day/{}/answer",
-        date.year, date.day
-    );
+    return format!("{}/answer", build_date_url(date));
 }
 
+fn build_date_url(date: Date) -> String {
+    return format!("{ADVENT_OF_CODE_URL_BASE}/{}/day/{}", date.year, date.day);
+}
