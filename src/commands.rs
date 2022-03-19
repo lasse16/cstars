@@ -1,5 +1,5 @@
+use crate::http::ADVENT_OF_CODE_URL_BASE;
 use crate::shared::Date;
-use crate::ADVENT_OF_CODE_URL_BASE;
 use html_editor as parser;
 use parser::{Htmlifiable, Queryable, Selector};
 use reqwest::blocking;

@@ -3,7 +3,6 @@ mod http;
 mod shared;
 use shared::Date;
 
-const ADVENT_OF_CODE_URL_BASE: &str = "https://adventofcode.com";
 fn main() -> Result<(), reqwest::Error> {
     let client = http::build_client()?;
     let result: String =

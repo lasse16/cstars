@@ -1,9 +1,8 @@
-use crate::ADVENT_OF_CODE_URL_BASE;
 use reqwest::{blocking, cookie, Url};
-use std::error::Error;
 use std::fs;
 use std::sync::Arc;
 
+pub const ADVENT_OF_CODE_URL_BASE: &str = "https://adventofcode.com";
 pub fn build_client() -> Result<blocking::Client, reqwest::Error> {
     let cookie_jar = cookie::Jar::default();
     let url = ADVENT_OF_CODE_URL_BASE.parse::<Url>().unwrap();
