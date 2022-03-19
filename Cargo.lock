@@ -109,8 +109,7 @@ checksum = "5827cebf4670468b8772dd191856768aedcb1b0278a04f989f7766351917b9dc"
 name = "cstars"
 version = "0.1.0"
 dependencies = [
- "html_editor",
- "reqwest",
+ "lib_cstars",
 ]
 
 [[package]]
@@ -383,6 +382,14 @@ name = "lazy_static"
 version = "1.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
+
+[[package]]
+name = "lib_cstars"
+version = "0.1.0"
+dependencies = [
+ "html_editor",
+ "reqwest",
+]
 
 [[package]]
 name = "libc"

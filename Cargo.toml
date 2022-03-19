@@ -7,6 +7,7 @@ authors = ["Lasse Haffke <lasse@haffke.me>"]
 description = "Interact with Advent of Code from the command-line"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[workspace]
+
 [dependencies]
-reqwest = { version = "0.11.10", features = ["blocking", "cookies"] }
-html_editor = { version = "0.3.0" }
+lib_cstars = { path = "lib_cstars" }
