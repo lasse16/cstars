@@ -9,3 +9,4 @@ description = "Interact with Advent of Code from the command-line"
 
 [dependencies]
 reqwest = { version = "0.11.10", features = ["blocking", "cookies"] }
+html_editor = { version = "0.3.0" }

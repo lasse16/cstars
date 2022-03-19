@@ -6,7 +6,8 @@ use shared::Date;
 const ADVENT_OF_CODE_URL_BASE: &str = "https://adventofcode.com";
 fn main() -> Result<(), reqwest::Error> {
     let client = http::build_client()?;
-    let result: String = commands::get_input_for_date(client, Date { day: 8, year: 2020 })?;
+    let result: String =
+        commands::get_description_for_date(client, Date { day: 8, year: 2020 }, 1)?;
     output_result(result);
     Ok(())
 }
