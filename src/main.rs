@@ -1,5 +1,5 @@
 use lib_cstars::commands;
-use lib_cstars::errors::{ConnectionError };
+use lib_cstars::errors::Error;
 use lib_cstars::http;
 
 mod cli;
@@ -7,7 +7,7 @@ mod cli;
 fn main() {
     let client = http::build_client().unwrap();
     let cli = cli::parse_cli_arguments();
-    let result: Result<String, ConnectionError> = match cli.command {
+    let result: Result<String, Error> = match cli.command {
         cli::Commands::Submit { solution, date } => {
             lib_cstars::commands::submit_solution_for_date(client, date.into(), solution)
         }
@@ -22,4 +22,8 @@ fn main() {
 
 fn output_result(result: String) {
     print!("{}", result);
+}
+
+fn output_error(error: Error) {
+    eprint!("{}", error);
 }
