@@ -1,7 +1,5 @@
-use std::error;
-
 use lib_cstars::commands;
-use lib_cstars::errors::{ConnectionError, Error};
+use lib_cstars::errors::{ConnectionError };
 use lib_cstars::http;
 
 mod cli;

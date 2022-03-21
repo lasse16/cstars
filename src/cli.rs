@@ -1,6 +1,4 @@
 use clap::{ArgEnum, Args, Parser, Subcommand};
-use lib_cstars::shared;
-use lib_cstars::shared::Date;
 
 pub fn parse_cli_arguments() -> Cli {
     Cli::parse()
