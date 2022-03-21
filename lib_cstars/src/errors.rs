@@ -1,31 +1,22 @@
-use std::error;
-
-pub trait Error: std::error::Error {}
-
 #[derive(Debug)]
-pub struct ConfigurationError {}
+pub enum Error {
+    ConfigurationError,
+    ConnectionError,
+}
 
-impl Error for ConfigurationError {}
-impl error::Error for ConfigurationError {}
-impl std::fmt::Display for ConfigurationError {
+impl std::error::Error for Error {}
+
+impl std::fmt::Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Configuration error")
+        match self {
+            Error::ConfigurationError => write!(f, "configuration error"),
+            Error::ConnectionError => write!(f, "connection error"),
+        }
     }
 }
 
-#[derive(Debug)]
-pub struct ConnectionError {}
-
-impl Error for ConnectionError {}
-impl error::Error for ConnectionError {}
-impl std::fmt::Display for ConnectionError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Connection error")
-    }
-}
-
-impl From<reqwest::Error> for ConnectionError {
+impl From<reqwest::Error> for Error {
     fn from(_: reqwest::Error) -> Self {
-        ConnectionError {}
+        Error::ConnectionError
     }
 }
