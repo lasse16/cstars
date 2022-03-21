@@ -1,13 +1,24 @@
+use std::error;
+
 use lib_cstars::commands;
 use lib_cstars::http;
-use lib_cstars::shared;
-use lib_cstars::shared::Date;
+
+mod cli;
 
 fn main() {
     let client = http::build_client().unwrap();
-    let result: String =
-        commands::get_description_for_date(client, Date { day: 8, year: 2020 }, 1).unwrap();
-    output_result(result);
+    let cli = cli::parse_cli_arguments();
+    let result: Result<String, Box<dyn error::Error>> = match cli.command {
+        cli::Commands::Submit { solution, date } => {
+            lib_cstars::commands::submit_solution_for_date(client, date.into(), solution)
+        }
+        cli::Commands::Get { object, date } => match object {
+            cli::GetType::Input => commands::get_input_for_date(client, date.into()),
+            cli::GetType::Description => commands::get_description_for_date(client, date.into(), 0),
+        },
+        cli::Commands::Config {} => todo!(),
+    };
+    output_result(result.unwrap());
 }
 
 fn output_result(result: String) {
