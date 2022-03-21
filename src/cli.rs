@@ -46,7 +46,7 @@ pub enum GetType {
 }
 
 #[derive(Debug, Args)]
-struct CliArgsDate {
+pub struct CliArgsDate {
     ///day
     day: u8,
 

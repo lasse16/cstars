@@ -1,6 +1,7 @@
 use std::error;
 
 use lib_cstars::commands;
+use lib_cstars::errors::{ConnectionError, Error};
 use lib_cstars::http;
 
 mod cli;
@@ -8,7 +9,7 @@ mod cli;
 fn main() {
     let client = http::build_client().unwrap();
     let cli = cli::parse_cli_arguments();
-    let result: Result<String, Box<dyn error::Error>> = match cli.command {
+    let result: Result<String, ConnectionError> = match cli.command {
         cli::Commands::Submit { solution, date } => {
             lib_cstars::commands::submit_solution_for_date(client, date.into(), solution)
         }
