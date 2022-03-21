@@ -1,7 +1,7 @@
-use clap::{ArgEnum, Args, Parser, Subcommand};
+use clap::{ArgEnum, Args, Error, Parser, Subcommand};
 
-pub fn parse_cli_arguments() -> Cli {
-    Cli::parse()
+pub fn parse_cli_arguments() -> Result<Cli, Error> {
+    Cli::try_parse()
 }
 
 #[derive(Parser)]

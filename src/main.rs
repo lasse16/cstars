@@ -3,10 +3,12 @@ use lib_cstars::errors::Error;
 use lib_cstars::http;
 
 mod cli;
+mod errors;
+use errors::CliError;
 
-fn main() {
-    let client = http::build_client().unwrap();
-    let cli = cli::parse_cli_arguments();
+fn main() -> Result<(), CliError> {
+    let client = http::build_client()?;
+    let cli = cli::parse_cli_arguments()?;
     let result: Result<String, Error> = match cli.command {
         cli::Commands::Submit { solution, date } => {
             lib_cstars::commands::submit_solution_for_date(client, date.into(), solution)
@@ -17,7 +19,7 @@ fn main() {
         },
         cli::Commands::Config {} => todo!(),
     };
-    output_result(result.unwrap());
+    Ok(output_result(result?))
 }
 
 fn output_result(result: String) {
