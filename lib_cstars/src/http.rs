@@ -10,11 +10,15 @@ pub fn build_client() -> Result<blocking::Client, Error> {
     let url = ADVENT_OF_CODE_URL_BASE.parse::<Url>().expect(
         "Error parsing hardcoded AOC Url; This should never happen, open an issue immediately!",
     );
-    let secret = fs::read_to_string("secret.txt").map_err(|_| Error::ConfigurationError)?;
+    let secret = fs::read_to_string("secret.txt").map_err(|err| Error::ConfigurationError {
+        message: format!("Failed to get secret: {:?}", err.to_string()),
+    })?;
 
     cookie_jar.add_cookie_str(&format!("session={}", &secret), &url);
     blocking::Client::builder()
         .cookie_provider(Arc::new(cookie_jar))
         .build()
-        .map_err(|_| Error::ConfigurationError)
+        .map_err(|err| Error::ConfigurationError {
+            message: err.to_string(),
+        })
 }
