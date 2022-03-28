@@ -38,27 +38,29 @@ pub fn get_description_for_date(
     let response_body = response.text()?;
     let response_body = &response_body.replace("\n", "");
 
-    let output = parse_day_description_from_html(response_body, part)?;
-
-    Ok(output)
+    parse_day_description_from_html(response_body, part)
 }
 
 fn parse_day_description_from_html(response_body: &str, part: u8) -> Result<String, Error> {
-    let html_tree = parser::parse(&response_body).unwrap();
+    let html_tree = parser::parse(&response_body).map_err(|err| Error::ConnectionError {
+        message: format!("Failed to parse response body: [ {} ]", err),
+    })?;
     let selector = Selector::from(".day-desc");
     let day_descriptions: Vec<String> = html_tree
         .query_all(&selector)
         .iter()
         .map(|x| x.children.html())
         .collect();
-    match part {
+    Ok(match part {
         0 => day_descriptions.join("\n"),
         1 => day_descriptions[0].to_owned(),
         2 => day_descriptions[1].to_owned(),
-        _ => Error::CommandError {
-            message: "Unknown part",
-        },
-    }
+        _ => {
+            return Err(Error::CommandError {
+                message: String::from("Unknown part"),
+            })
+        }
+    })
 }
 
 fn build_input_url(date: Date) -> String {

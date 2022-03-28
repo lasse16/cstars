@@ -2,6 +2,7 @@
 pub enum Error {
     ConfigurationError { message: String },
     ConnectionError { message: String },
+    CommandError { message: String },
 }
 
 impl std::error::Error for Error {}
@@ -11,6 +12,7 @@ impl std::fmt::Display for Error {
         match self {
             Error::ConfigurationError { message } => write!(f, "configuration error: {}", message),
             Error::ConnectionError { message } => write!(f, "connection error: {}", message),
+            Error::CommandError { message } => write!(f, "command error: {}", message),
         }
     }
 }
