@@ -13,8 +13,10 @@ pub fn build_client() -> Result<blocking::Client, Error> {
     let secret = fs::read_to_string("secret.txt").map_err(|err| Error::ConfigurationError {
         message: format!("Failed to get secret: {:?}", err.to_string()),
     })?;
+    log::trace!("Retrieved session secret");
 
     cookie_jar.add_cookie_str(&format!("session={}", &secret), &url);
+    log::trace!("Adding session secret cookie");
     blocking::Client::builder()
         .cookie_provider(Arc::new(cookie_jar))
         .build()

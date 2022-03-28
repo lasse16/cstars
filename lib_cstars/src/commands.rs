@@ -5,6 +5,7 @@ use parser::{Htmlifiable, Queryable, Selector};
 use reqwest::blocking;
 
 pub fn get_input_for_date(client: blocking::Client, date: Date) -> Result<String, Error> {
+    log::trace!("Function: input_for_date called; args:  {:?}", &date);
     let request = client.get(build_input_url(date));
     let response = request.send()?;
     Ok(response.text()?)
@@ -15,6 +16,7 @@ pub fn submit_solution_for_date(
     date: Date,
     solution: String,
 ) -> Result<String, Error> {
+    log::trace!("Function: solution_for_date called; args:  {:?}", date);
     let request = client.post(build_answer_url(date)).body(solution);
     let response = request.send()?;
     Ok(response.text()?)
@@ -25,8 +27,14 @@ pub fn get_description_for_date(
     date: Date,
     part: u8,
 ) -> Result<String, Error> {
+    log::trace!("Function: description_for_date called; args:  {:?}", date);
     let request = client.get(build_date_url(date));
     let response = request.send()?;
+    log::debug!(
+        "Received response {:?} from [{:?}]",
+        response,
+        response.url()
+    );
     let response_body = response.text()?;
     let response_body = &response_body.replace("\n", "");
 

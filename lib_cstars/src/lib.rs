@@ -3,6 +3,8 @@ pub mod errors;
 pub mod http;
 pub mod shared;
 
+use log;
+
 #[cfg(test)]
 mod tests {
     #[test]
