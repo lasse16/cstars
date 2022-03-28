@@ -27,5 +27,5 @@ pub fn build_client() -> Result<blocking::Client, Error> {
 }
 
 fn get_secret() -> Result<String, std::io::Error> {
-    fs::read_to_string("secret.txt")
+    fs::read_to_string("/home/lasse/.config/cstars/secret.txt")
 }
