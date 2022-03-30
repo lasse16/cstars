@@ -8,7 +8,12 @@ use errors::CliError;
 
 fn main() -> Result<(), CliError> {
     let client = http::build_client()?;
-    let cli = cli::parse_cli_arguments()?;
+    let cli = match cli::parse_cli_arguments() {
+        Ok(cli) => cli,
+        // Do not wrap clap error as their error reporting is too nice
+        Err(err) => err.exit(),
+    };
+
     let result: Result<String, Error> = match cli.command {
         cli::Commands::Submit { solution, date } => {
             lib_cstars::commands::submit_solution_for_date(client, date.into(), solution)
