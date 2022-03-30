@@ -1,4 +1,5 @@
 use reqwest::{blocking, cookie, Url};
+use secrecy::{ExposeSecret, SecretString};
 use std::fs;
 use std::sync::Arc;
 
@@ -16,7 +17,7 @@ pub fn build_client() -> Result<blocking::Client, Error> {
     })?;
     log::trace!("Retrieved session secret");
 
-    cookie_jar.add_cookie_str(&format!("session={}", &secret), &url);
+    cookie_jar.add_cookie_str(&format!("session={}", &secret.expose_secret()), &url);
     log::trace!("Adding session secret cookie");
     blocking::Client::builder()
         .cookie_provider(Arc::new(cookie_jar))
@@ -26,6 +27,7 @@ pub fn build_client() -> Result<blocking::Client, Error> {
         })
 }
 
-fn get_secret() -> Result<String, std::io::Error> {
-    fs::read_to_string("/home/lasse/.config/cstars/secret.txt")
+fn get_secret() -> Result<SecretString, std::io::Error> {
+    let read_secret = fs::read_to_string("/home/lasse/.config/cstars/secret.txt")?;
+    Ok(SecretString::from(read_secret))
 }
