@@ -6,7 +6,7 @@ use crate::errors::Error;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Configuration {
-    session_cookie_retrieval_command: String,
+    pub session_cookie_retrieval_command: String,
 }
 
 impl Default for Configuration {
