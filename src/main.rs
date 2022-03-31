@@ -1,13 +1,17 @@
 use lib_cstars::commands;
+use lib_cstars::configuration;
 use lib_cstars::errors::Error;
 use lib_cstars::http;
+use std::path::Path;
 
 mod cli;
 mod errors;
 use errors::CliError;
 
 fn main() -> Result<(), CliError> {
-    let client = http::build_client()?;
+    let config =
+        configuration::parse_configuration(Path::new(r#"/home/lasse/.config/cstars/cstars.toml"#))?;
+    let client = http::build_client(&config)?;
     let cli = match cli::parse_cli_arguments() {
         Ok(cli) => cli,
         // Do not wrap clap error as their error reporting is too nice
