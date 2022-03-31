@@ -45,6 +45,5 @@ fn get_secret(secret_retrieval_command: &str) -> Result<SecretString, std::io::E
         ));
     }
     let retrieved_secret = String::from_utf8(command_output.stdout).unwrap();
-    //fs::read_to_string("/home/lasse/.config/cstars/secret.txt")?;
     Ok(SecretString::from(retrieved_secret))
 }
