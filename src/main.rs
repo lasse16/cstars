@@ -26,7 +26,7 @@ fn main() -> Result<(), CliError> {
             cli::GetType::Input => commands::get_input_for_date(client, date.into()),
             cli::GetType::Description => commands::get_description_for_date(client, date.into(), 0),
         },
-        cli::Commands::Config {} => todo!(),
+        cli::Commands::Config {} => commands::output_config(&config),
     };
     Ok(output_result(result?))
 }

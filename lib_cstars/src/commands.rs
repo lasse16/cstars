@@ -74,3 +74,7 @@ fn build_answer_url(date: Date) -> String {
 fn build_date_url(date: Date) -> String {
     return format!("{ADVENT_OF_CODE_URL_BASE}/{}/day/{}", date.year, date.day);
 }
+
+pub fn output_config(config: &crate::configuration::Configuration) -> Result<String, Error> {
+    Ok(format!("{:?}", config))
+}
