@@ -38,7 +38,8 @@ pub fn get_description_for_date(
     );
     let response_body = response.text()?;
 
-    parse_day_description_from_html(&response_body, part)
+    let day_descriptions = parse_day_description_from_html(&response_body, part)?;
+    return Ok(day_descriptions);
 }
 
 fn parse_day_description_from_html(response_body: &str, part: u8) -> Result<String, Error> {
