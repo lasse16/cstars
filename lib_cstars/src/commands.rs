@@ -43,9 +43,53 @@ pub fn get_description_for_date(
     let selected_day_descriptions = select_descriptions_via_part(&day_descriptions, part)?;
     let converted_descriptions = match output_format {
         OutputFormat::Html => convert_to_html_descriptions(selected_day_descriptions),
-        OutputFormat::Markdown => todo!(),
+        OutputFormat::Markdown => convert_to_markdown_descriptions(selected_day_descriptions),
     }?;
     return Ok(converted_descriptions.join("\n"));
+}
+
+fn convert_to_markdown_descriptions(
+    selected_day_descriptions: &[parser::Element],
+) -> Result<Vec<String>, Error> {
+    let mut output = Vec::<String>::new();
+    for day_desc in selected_day_descriptions {
+        let mut converted_day_desc = Vec::<String>::with_capacity(day_desc.children.len());
+        // We can safely ignore the day_desc element as it is only a marker
+        for child in &day_desc.children {
+            converted_day_desc.push(convert_node_to_markdown(child));
+        }
+        output.push(converted_day_desc.join("\n"));
+    }
+    Ok(output)
+}
+
+fn convert_node_to_markdown(node: &parser::Node) -> String {
+    match node {
+        parser::Node::Element { .. } => convert_html_tag_to_markdown(&node.clone().into_element()),
+        parser::Node::Text(text) => text.to_string(),
+        parser::Node::Comment(_) => "".to_string(),
+        parser::Node::Doctype => "".to_string(),
+    }
+}
+
+fn convert_html_tag_to_markdown(element: &parser::Element) -> String {
+    let (prefix, postfix) = match &*element.name {
+        "p" => ("\n", ""),
+        // Necessary whitespace in prefix
+        "h1" => ("# ", ""),
+        "h2" => ("## ", ""),
+        "em" | "i" => ("*", "*"),
+        "code" => ("```", "```"),
+        "pre" => ("", ""),
+        _ => ("unknown tag", ""),
+    };
+
+    let mut contained_information: Vec<String> = Vec::new();
+    for child in &element.children {
+        contained_information.push(convert_node_to_markdown(child));
+    }
+
+    format!("{}{}{}", prefix, &contained_information.join(""), postfix)
 }
 
 fn select_descriptions_via_part(
