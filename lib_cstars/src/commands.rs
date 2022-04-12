@@ -1,7 +1,8 @@
 use crate::shared::Date;
 use crate::{errors::Error, http::ADVENT_OF_CODE_URL_BASE};
 use html_editor as parser;
-use parser::{Htmlifiable, Queryable, Selector};
+use parser::prelude::{Htmlifiable, Queryable};
+use parser::Selector;
 use reqwest::blocking;
 
 pub fn get_input_for_date(client: blocking::Client, date: Date) -> Result<String, Error> {
@@ -36,9 +37,8 @@ pub fn get_description_for_date(
         response.url()
     );
     let response_body = response.text()?;
-    let response_body = &response_body.replace("\n", "");
 
-    parse_day_description_from_html(response_body, part)
+    parse_day_description_from_html(&response_body, part)
 }
 
 fn parse_day_description_from_html(response_body: &str, part: u8) -> Result<String, Error> {
