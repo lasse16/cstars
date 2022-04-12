@@ -24,7 +24,12 @@ fn main() -> Result<(), CliError> {
         }
         cli::Commands::Get { object, date } => match object {
             cli::GetType::Input => commands::get_input_for_date(client, date.into()),
-            cli::GetType::Description => commands::get_description_for_date(client, date.into(), 0),
+            cli::GetType::Description => commands::get_description_for_date(
+                client,
+                date.into(),
+                0,
+                lib_cstars::shared::OutputFormat::Html,
+            ),
         },
         cli::Commands::Config {} => commands::output_config(&config),
     };

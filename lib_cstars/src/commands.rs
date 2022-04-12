@@ -1,4 +1,4 @@
-use crate::shared::Date;
+use crate::shared::{Date, OutputFormat};
 use crate::{errors::Error, http::ADVENT_OF_CODE_URL_BASE};
 use html_editor as parser;
 use parser::prelude::{Htmlifiable, Queryable};
@@ -27,6 +27,7 @@ pub fn get_description_for_date(
     client: blocking::Client,
     date: Date,
     part: u8,
+    output_format: OutputFormat,
 ) -> Result<String, Error> {
     log::trace!("Function: description_for_date called; args:  {:?}", date);
     let request = client.get(build_date_url(date));
@@ -40,8 +41,11 @@ pub fn get_description_for_date(
 
     let day_descriptions = parse_day_description_from_html(&response_body)?;
     let selected_day_descriptions = select_descriptions_via_part(&day_descriptions, part)?;
-    let html_descriptions = convert_to_html_descriptions(&selected_day_descriptions)?;
-    return Ok(html_descriptions.join("\n"));
+    let converted_descriptions = match output_format {
+        OutputFormat::Html => convert_to_html_descriptions(selected_day_descriptions),
+        OutputFormat::Markdown => todo!(),
+    }?;
+    return Ok(converted_descriptions.join("\n"));
 }
 
 fn select_descriptions_via_part(
