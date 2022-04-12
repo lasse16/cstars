@@ -38,30 +38,42 @@ pub fn get_description_for_date(
     );
     let response_body = response.text()?;
 
-    let day_descriptions = parse_day_description_from_html(&response_body, part)?;
-    return Ok(day_descriptions);
+    let day_descriptions = parse_day_description_from_html(&response_body)?;
+    let selected_day_descriptions = select_descriptions_via_part(&day_descriptions, part)?;
+    let html_descriptions = convert_to_html_descriptions(&selected_day_descriptions)?;
+    return Ok(html_descriptions.join("\n"));
 }
 
-fn parse_day_description_from_html(response_body: &str, part: u8) -> Result<String, Error> {
-    let html_tree = parser::parse(&response_body).map_err(|err| Error::ConnectionError {
-        message: format!("Failed to parse response body: [ {} ]", err),
-    })?;
-    let selector = Selector::from(".day-desc");
-    let day_descriptions: Vec<String> = html_tree
-        .query_all(&selector)
-        .iter()
-        .map(|x| x.children.html())
-        .collect();
+fn select_descriptions_via_part(
+    day_descriptions: &[parser::Element],
+    part: u8,
+) -> Result<&[parser::Element], Error> {
     Ok(match part {
-        0 => day_descriptions.join("\n"),
-        1 => day_descriptions[0].to_owned(),
-        2 => day_descriptions[1].to_owned(),
+        0 => day_descriptions,
+        1 => &day_descriptions[0..1],
+        2 => &day_descriptions[1..2],
         _ => {
             return Err(Error::CommandError {
                 message: String::from("Unknown part"),
             })
         }
     })
+}
+
+fn convert_to_html_descriptions(
+    day_descriptions: &[parser::Element],
+) -> Result<Vec<String>, Error> {
+    let converted_descriptions = day_descriptions.iter().map(|x| x.children.html()).collect();
+    Ok(converted_descriptions)
+}
+
+fn parse_day_description_from_html(response_body: &str) -> Result<Vec<parser::Element>, Error> {
+    let html_tree = parser::parse(&response_body).map_err(|err| Error::ConnectionError {
+        message: format!("Failed to parse response body: [ {} ]", err),
+    })?;
+    let selector = Selector::from(".day-desc");
+    let day_descriptions = html_tree.query_all(&selector);
+    return Ok(day_descriptions);
 }
 
 fn build_input_url(date: Date) -> String {
