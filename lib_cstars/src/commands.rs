@@ -32,7 +32,21 @@ pub fn submit_solution_for_date(
             message: format!("Submitted solution for missing date [ {:?} ]", &date),
         });
     }
-    Ok(response.text()?)
+    let response_text = response.text()?;
+    Ok(parse_solution_correctness_from_response(&response_text))
+}
+
+fn parse_solution_correctness_from_response(response_text: &str) -> String {
+    if response_text.contains("not the right answer") {
+        return String::from("Your answer was incorrect");
+    }
+    if response_text.contains("wait") {
+        return String::from("You submitted an answer too early");
+    }
+    if response_text.contains("right answer") {
+        return String::from("Your answer was correct, Good Job!");
+    }
+    return String::from("Unexpected response");
 }
 
 pub fn get_description_for_date(
