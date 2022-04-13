@@ -119,7 +119,7 @@ fn select_descriptions_via_part(
         2 => &day_descriptions[1..2],
         _ => {
             return Err(Error::CommandError {
-                message: String::from("Unknown part"),
+                message: format!("Requested an unknown part [ {:?} ]", part),
             })
         }
     })
