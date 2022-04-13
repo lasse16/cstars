@@ -7,8 +7,13 @@ use reqwest::blocking;
 
 pub fn get_input_for_date(client: blocking::Client, date: Date) -> Result<String, Error> {
     log::trace!("Function: input_for_date called; args:  {:?}", &date);
-    let request = client.get(build_input_url(date));
+    let request = client.get(build_input_url(&date));
     let response = request.send()?;
+    if response.status() == reqwest::StatusCode::NOT_FOUND {
+        return Err(Error::CommandError {
+            message: format!("Requested input for missing date [ {:?} ]", &date),
+        });
+    }
     Ok(response.text()?)
 }
 
@@ -18,8 +23,13 @@ pub fn submit_solution_for_date(
     solution: String,
 ) -> Result<String, Error> {
     log::trace!("Function: solution_for_date called; args:  {:?}", date);
-    let request = client.post(build_answer_url(date)).body(solution);
+    let request = client.post(build_answer_url(&date)).body(solution);
     let response = request.send()?;
+    if response.status() == reqwest::StatusCode::NOT_FOUND {
+        return Err(Error::CommandError {
+            message: format!("Submitted solution for missing date [ {:?} ]", &date),
+        });
+    }
     Ok(response.text()?)
 }
 
@@ -30,13 +40,18 @@ pub fn get_description_for_date(
     output_format: OutputFormat,
 ) -> Result<String, Error> {
     log::trace!("Function: description_for_date called; args:  {:?}", date);
-    let request = client.get(build_date_url(date));
+    let request = client.get(build_date_url(&date));
     let response = request.send()?;
     log::debug!(
         "Received response {:?} from [{:?}]",
         response,
         response.url()
     );
+    if response.status() == reqwest::StatusCode::NOT_FOUND {
+        return Err(Error::CommandError {
+            message: format!("Requested description for missing date [ {:?} ]", &date),
+        });
+    }
     let response_body = response.text()?;
 
     let day_descriptions = parse_day_description_from_html(&response_body)?;
@@ -126,15 +141,15 @@ fn parse_day_description_from_html(response_body: &str) -> Result<Vec<parser::El
     return Ok(day_descriptions);
 }
 
-fn build_input_url(date: Date) -> String {
+fn build_input_url(date: &Date) -> String {
     return format!("{}/input", build_date_url(date));
 }
 
-fn build_answer_url(date: Date) -> String {
+fn build_answer_url(date: &Date) -> String {
     return format!("{}/answer", build_date_url(date));
 }
 
-fn build_date_url(date: Date) -> String {
+fn build_date_url(date: &Date) -> String {
     return format!("{ADVENT_OF_CODE_URL_BASE}/{}/day/{}", date.year, date.day);
 }
 
