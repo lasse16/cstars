@@ -81,6 +81,8 @@ fn convert_html_tag_to_markdown(element: &parser::Element) -> String {
         "em" | "i" => ("*", "*"),
         "code" => ("```", "```"),
         "pre" => ("", ""),
+        "a" => ("", ""),
+        "span" => ("", ""),
         _ => ("unknown tag", ""),
     };
 
