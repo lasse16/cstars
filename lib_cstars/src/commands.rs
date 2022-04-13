@@ -17,6 +17,12 @@ pub fn get_input_for_date(client: blocking::Client, date: Date) -> Result<String
     Ok(response.text()?)
 }
 
+enum Correctness {
+    IncorrectAnswer,
+    TooRecentAnswer,
+    CorrectAnswer,
+}
+
 pub fn submit_solution_for_date(
     client: blocking::Client,
     date: Date,
@@ -33,20 +39,37 @@ pub fn submit_solution_for_date(
         });
     }
     let response_text = response.text()?;
-    Ok(parse_solution_correctness_from_response(&response_text))
+    Ok(
+        match parse_solution_correctness_from_response(&response_text)? {
+            Correctness::IncorrectAnswer => {
+                format!("Your answer was incorrect, answer [ {} ]", &solution)
+            }
+            Correctness::TooRecentAnswer => {
+                format!("Your last answer was given too recent")
+            }
+            Correctness::CorrectAnswer => {
+                format!(
+                    "Your answer was correct. Good job! answer [ {} ]",
+                    &solution
+                )
+            }
+        },
+    )
 }
 
-fn parse_solution_correctness_from_response(response_text: &str) -> String {
+fn parse_solution_correctness_from_response(response_text: &str) -> Result<Correctness, Error> {
     if response_text.contains("not the right answer") {
-        return String::from("Your answer was incorrect");
+        return Ok(Correctness::IncorrectAnswer);
     }
     if response_text.contains("wait") {
-        return String::from("You submitted an answer too early");
+        return Ok(Correctness::TooRecentAnswer);
     }
     if response_text.contains("right answer") {
-        return String::from("Your answer was correct, Good Job!");
+        return Ok(Correctness::CorrectAnswer);
     }
-    return String::from("Unexpected response");
+    Err(Error::ConfigurationError {
+        message: String::from("Failed to parse submission response text"),
+    })
 }
 
 pub fn get_description_for_date(
