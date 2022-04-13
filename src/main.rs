@@ -22,13 +22,13 @@ fn main() -> Result<(), CliError> {
         cli::Commands::Submit { solution, date } => {
             lib_cstars::commands::submit_solution_for_date(client, date.into(), solution)
         }
-        cli::Commands::Get { object, date } => match object {
-            cli::GetType::Input => commands::get_input_for_date(client, date.into()),
-            cli::GetType::Description => commands::get_description_for_date(
+        cli::Commands::Get { object } => match object {
+            cli::GetType::Input { date } => commands::get_input_for_date(client, date.into()),
+            cli::GetType::Description { output, date } => commands::get_description_for_date(
                 client,
                 date.into(),
                 0,
-                lib_cstars::shared::OutputFormat::Html,
+                output.unwrap_or(cli::CliOutputType::Html).into(),
             ),
         },
         cli::Commands::Config {} => commands::output_config(&config),

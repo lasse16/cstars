@@ -1,4 +1,5 @@
 use clap::{ArgEnum, Args, Error, Parser, Subcommand};
+use lib_cstars::shared::OutputFormat;
 
 pub fn parse_cli_arguments() -> Result<Cli, Error> {
     Cli::try_parse()
@@ -25,31 +26,72 @@ pub enum Commands {
         date: CliArgsDate,
     },
 
-    /// Get a specific object for a date
+    /// Get a specific information for a date
     Get {
-        #[clap(arg_enum)]
+        #[clap(subcommand)]
         object: GetType,
-
-        #[clap(flatten)]
-        date: CliArgsDate,
     },
     /// Interact with the config file
     Config {},
 }
 
-#[derive(Clone, Debug, ArgEnum)]
+#[derive(Clone, Debug, Subcommand)]
 pub enum GetType {
-    Input,
-    Description,
+    ///Get the input for a specific date
+    Input {
+        #[clap(flatten)]
+        date: CliArgsDate,
+    },
+
+    ///Get the description for a specific date
+    Description {
+        #[clap(flatten)]
+        date: CliArgsDate,
+        output: Option<CliOutputType>,
+    },
 }
 
-#[derive(Debug, Args)]
+#[derive(Debug, Args, Clone)]
 pub struct CliArgsDate {
     ///day
     day: u8,
 
     ///year
     year: u16,
+}
+
+#[derive(Debug, ArgEnum, Clone)]
+pub enum CliOutputType {
+    ///markdown
+    Markdown,
+    ///html
+    Html,
+}
+
+impl std::str::FromStr for CliOutputType {
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(match s {
+            "markdown" | "md" => CliOutputType::Markdown,
+            "html" => CliOutputType::Html,
+            _ => {
+                return Err(Error::raw(
+                    clap::ErrorKind::InvalidValue,
+                    "Unrecognized output type",
+                ))
+            }
+        })
+    }
+}
+
+impl From<CliOutputType> for lib_cstars::shared::OutputFormat {
+    fn from(date: CliOutputType) -> Self {
+        match date {
+            CliOutputType::Markdown => OutputFormat::Markdown,
+            CliOutputType::Html => OutputFormat::Html,
+        }
+    }
 }
 
 impl From<CliArgsDate> for lib_cstars::shared::Date {
