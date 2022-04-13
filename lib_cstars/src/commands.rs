@@ -23,7 +23,9 @@ pub fn submit_solution_for_date(
     solution: String,
 ) -> Result<String, Error> {
     log::trace!("Function: solution_for_date called; args:  {:?}", date);
-    let request = client.post(build_answer_url(&date)).body(solution);
+    let form_params =
+        std::collections::hash_map::HashMap::from([("answer", solution.as_str()), ("level", "1")]);
+    let request = client.post(build_answer_url(&date)).form(&form_params);
     let response = request.send()?;
     if response.status() == reqwest::StatusCode::NOT_FOUND {
         return Err(Error::CommandError {
