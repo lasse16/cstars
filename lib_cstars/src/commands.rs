@@ -57,6 +57,39 @@ pub fn submit_solution_for_date(
     )
 }
 
+pub fn get_status_for_date(client: blocking::Client, date: Date) -> Result<String, Error> {
+    let request = client.get(build_year_url(&date));
+    let response = request.send()?;
+
+    let star_count: u8 = parse_star_count_from_response(response.text()?, date.day)?;
+    Ok(star_count.to_string())
+}
+
+pub fn parse_star_count_from_response(text: String, day: u8) -> Result<u8, Error> {
+    let html_tree = parser::parse(&text).map_err(|err| Error::ConnectionError {
+        message: format!("Failed to parse response body: [ {} ]", err),
+    })?;
+    //FIXME It's a workaround due to https://github.com/lomirus/html_editor/issues/4
+    let selector = Selector::from(format!(".calendar-day{}", day).as_str());
+    let selector_one_star =
+        Selector::from(format!(".calendar-day{} calendar-complete", day).as_str());
+    let selector_two_stars =
+        Selector::from(format!(".calendar-day{} calendar-verycomplete", day).as_str());
+    if html_tree.query(&selector).is_some() {
+        return Ok(0);
+    }
+    if html_tree.query(&selector_one_star).is_some() {
+        return Ok(1);
+    }
+    if html_tree.query(&selector_two_stars).is_some() {
+        return Ok(2);
+    } else {
+        return Err(Error::ConnectionError {
+            message: "Failed to parse star count from css classes".to_string(),
+        });
+    }
+}
+
 fn parse_solution_correctness_from_response(response_text: &str) -> Result<Correctness, Error> {
     if response_text.contains("not the right answer") {
         return Ok(Correctness::IncorrectAnswer);
@@ -79,7 +112,7 @@ pub fn get_description_for_date(
     output_format: OutputFormat,
 ) -> Result<String, Error> {
     log::trace!("Function: description_for_date called; args:  {:?}", date);
-    let request = client.get(build_date_url(&date));
+    let request = client.get(build_day_url(&date));
     let response = request.send()?;
     log::debug!(
         "Received response {:?} from [{:?}]",
@@ -181,15 +214,19 @@ fn parse_day_description_from_html(response_body: &str) -> Result<Vec<parser::El
 }
 
 fn build_input_url(date: &Date) -> String {
-    return format!("{}/input", build_date_url(date));
+    return format!("{}/input", build_day_url(date));
 }
 
 fn build_answer_url(date: &Date) -> String {
-    return format!("{}/answer", build_date_url(date));
+    return format!("{}/answer", build_day_url(date));
 }
 
-fn build_date_url(date: &Date) -> String {
-    return format!("{ADVENT_OF_CODE_URL_BASE}/{}/day/{}", date.year, date.day);
+fn build_day_url(date: &Date) -> String {
+    return format!("{}/day/{}", build_year_url(date), date.day);
+}
+
+fn build_year_url(date: &Date) -> String {
+    return format!("{ADVENT_OF_CODE_URL_BASE}/{}", date.year);
 }
 
 pub fn output_config(config: &crate::configuration::Configuration) -> Result<String, Error> {

@@ -43,6 +43,12 @@ pub enum GetType {
         date: CliArgsDate,
     },
 
+    ///Get the input for a specific date
+    StarCount {
+        #[clap(flatten)]
+        date: CliArgsDate,
+    },
+
     ///Get the description for a specific date
     Description {
         #[clap(flatten)]

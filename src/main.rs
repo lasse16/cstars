@@ -30,6 +30,7 @@ fn main() -> Result<(), CliError> {
                 0,
                 output.unwrap_or(cli::CliOutputType::Html).into(),
             ),
+            cli::GetType::StarCount { date } => commands::get_status_for_date(client, date.into()),
         },
         cli::Commands::Config {} => commands::output_config(&config),
     };
