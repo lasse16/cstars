@@ -31,7 +31,7 @@ pub enum Commands {
         #[clap(subcommand)]
         object: GetType,
     },
-    /// Interact with the config file
+    /// Print the used configuration
     Config {},
 }
 
@@ -43,7 +43,7 @@ pub enum GetType {
         date: CliArgsDate,
     },
 
-    ///Get the input for a specific date
+    ///Get the completed puzzle parts for a specific date
     StarCount {
         #[clap(flatten)]
         date: CliArgsDate,
