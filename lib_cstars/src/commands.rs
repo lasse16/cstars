@@ -3,8 +3,7 @@ use crate::{
     cache::Cacher, configuration::Configuration, errors::Error, http::ADVENT_OF_CODE_URL_BASE,
 };
 use html_editor as parser;
-use parser::prelude::{Htmlifiable, Queryable};
-use parser::Selector;
+use parser::operation::{Htmlifiable, Queryable, Selector};
 use reqwest::blocking;
 
 pub fn get_input_for_date<T: Cacher<String>>(
@@ -198,7 +197,7 @@ fn convert_node_to_markdown(node: &parser::Node) -> String {
         parser::Node::Element { .. } => convert_html_tag_to_markdown(&node.clone().into_element()),
         parser::Node::Text(text) => text.to_string(),
         parser::Node::Comment(_) => "".to_string(),
-        parser::Node::Doctype => "".to_string(),
+        parser::Node::Doctype(_) => "".to_string(),
     }
 }
 
