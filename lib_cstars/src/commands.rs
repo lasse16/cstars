@@ -103,25 +103,20 @@ fn parse_star_count_from_response(text: String, day: u8) -> Result<u8, Error> {
     let html_tree = parser::parse(&text).map_err(|err| Error::ConnectionError {
         message: format!("Failed to parse response body: [ {} ]", err),
     })?;
-    //FIXME It's a workaround due to https://github.com/lomirus/html_editor/issues/4
     let selector = Selector::from(format!(".calendar-day{}", day).as_str());
-    let selector_one_star =
-        Selector::from(format!(".calendar-day{} calendar-complete", day).as_str());
-    let selector_two_stars =
-        Selector::from(format!(".calendar-day{} calendar-verycomplete", day).as_str());
-    if html_tree.query(&selector).is_some() {
-        return Ok(0);
-    }
-    if html_tree.query(&selector_one_star).is_some() {
+    let day_element = html_tree.query(&selector).unwrap();
+    let (_, class_attribute) = day_element
+        .attrs
+        .iter()
+        .find(|(name, _)| name == "class")
+        .unwrap();
+    if class_attribute.contains("calendar-complete") {
         return Ok(1);
     }
-    if html_tree.query(&selector_two_stars).is_some() {
+    if class_attribute.contains("calendar-verycomplete") {
         return Ok(2);
-    } else {
-        return Err(Error::ConnectionError {
-            message: "Failed to parse star count from css classes".to_string(),
-        });
     }
+    return Ok(0);
 }
 
 fn parse_solution_correctness_from_response(response_text: &str) -> Result<Correctness, Error> {
