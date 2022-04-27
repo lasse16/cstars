@@ -3,7 +3,7 @@ use lib_cstars::commands;
 use lib_cstars::configuration;
 use lib_cstars::errors::Error;
 use lib_cstars::http;
-use std::path::Path;
+
 
 mod cli;
 mod errors;
@@ -43,7 +43,8 @@ fn main() -> Result<(), CliError> {
         },
         cli::Commands::Config {} => commands::output_config(&config),
     };
-    Ok(output_result(result?))
+    output_result(result?);
+    Ok(())
 }
 
 fn output_result(result: String) {
