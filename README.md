@@ -60,7 +60,7 @@ The cache can be found at the `config.cache_dir`. It is kept in plain text.
 `CStars` allows for some configuration.
 It uses the `directories` crate to discover the configuration file.
 Check the crate's documentation for all valid [options](https://github.com/dirs-dev/directories-rs#projectdirs).
-To the configuration directory determined by `directories` is the file name `cstars.toml` appended.
+Append `cstars.toml` to the configuration directory determined by `directories` to get the final file location.
 
 One possible example location on Linux system is `$HOME/.config/cstars/cstars.toml`.
 
