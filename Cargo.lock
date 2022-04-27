@@ -160,6 +160,7 @@ name = "cstars"
 version = "0.1.0"
 dependencies = [
  "clap",
+ "directories",
  "lib_cstars",
 ]
 

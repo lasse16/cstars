@@ -10,8 +10,12 @@ mod errors;
 use errors::CliError;
 
 fn main() -> Result<(), CliError> {
-    let config =
-        configuration::parse_configuration(Path::new(r#"/home/lasse/.config/cstars/cstars.toml"#))?;
+    let config = configuration::parse_configuration(
+        &directories::ProjectDirs::from("", "cstars", "cstars")
+            .unwrap()
+            .config_dir()
+            .join("cstars.toml"),
+    )?;
     let client = http::build_client(&config)?;
     let cacher = cache::FileBasedCacher::new(&config);
     let cli = match cli::parse_cli_arguments() {

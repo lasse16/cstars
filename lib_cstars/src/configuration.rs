@@ -1,3 +1,4 @@
+use directories;
 use figment::providers::{Format, Toml};
 use serde::{Deserialize, Serialize};
 use std::path::Path;
@@ -14,7 +15,11 @@ impl Default for Configuration {
     fn default() -> Self {
         Self {
             session_cookie_retrieval_command: String::from("cat secret.txt"),
-            cache_dir: std::path::PathBuf::from("/home/lasse/.cache/cstars"),
+            cache_dir: std::path::PathBuf::from(
+                directories::ProjectDirs::from("", "cstars", "cstars")
+                    .unwrap()
+                    .cache_dir(),
+            ),
         }
     }
 }
