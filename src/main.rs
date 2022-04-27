@@ -18,11 +18,9 @@ fn main() -> Result<(), CliError> {
     )?;
     let client = http::build_client(&config)?;
     let cacher = cache::FileBasedCacher::new(&config);
-    let cli = match cli::parse_cli_arguments() {
-        Ok(cli) => cli,
-        // Do not wrap clap error as their error reporting is too nice
-        Err(err) => err.exit(),
-    };
+    let cli = cli::parse_cli_arguments()
+        .map_err(|err| err.exit())
+        .unwrap();
 
     let result: Result<String, Error> = match cli.command {
         cli::Commands::Submit { solution, date } => {
