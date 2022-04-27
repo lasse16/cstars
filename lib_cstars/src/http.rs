@@ -1,6 +1,5 @@
 use reqwest::{blocking, cookie, Url};
 use secrecy::{ExposeSecret, SecretString};
-use std::fs;
 use std::process::Command;
 use std::sync::Arc;
 
