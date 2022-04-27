@@ -12,3 +12,4 @@ secrecy = { version = "0.8.0" }
 log = { version = "0.4.16" }
 serde = { version = "^1.0.0" }
 figment = { version = "^0.10.0", features = ["toml"] }
+directories = { version = "^4.0.0" }
