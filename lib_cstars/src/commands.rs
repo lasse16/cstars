@@ -39,8 +39,8 @@ pub fn submit_solution_for_date<T: Cacher<String>>(
     cacher: T,
     client: blocking::Client,
     date: Date,
-    solution: String,
-) -> Result<String, Error> {
+    solution: &String,
+) -> Result<AnswerStatus, Error> {
     log::trace!("Function: solution_for_date called; args:  {:?}", date);
 
     let request_spec = specify_request(&date, RequestType::PostAnswer);
@@ -50,7 +50,7 @@ pub fn submit_solution_for_date<T: Cacher<String>>(
             .find(|&attempt| attempt == solution)
             .is_some()
         {
-            return Ok("RepeatedAnswer".to_string());
+            return Ok(AnswerStatus::Repeated);
         }
     }
 
@@ -64,23 +64,11 @@ pub fn submit_solution_for_date<T: Cacher<String>>(
         }));
     }
     let response_text = response.text()?;
-    Ok(
-        match parse_solution_correctness_from_response(&response_text)? {
-            Correctness::IncorrectAnswer => {
-                cacher.append(&request_spec, &solution);
-                format!("Your answer was incorrect, answer [ {} ]", &solution)
-            }
-            Correctness::TooRecentAnswer => {
-                format!("Your last answer was given too recent")
-            }
-            Correctness::CorrectAnswer => {
-                format!(
-                    "Your answer was correct. Good job! answer [ {} ]",
-                    &solution
-                )
-            }
-        },
-    )
+    let result = parse_answer_state_from_response_text(&response_text)?;
+    if let AnswerStatus::Correctness(_) = result {
+        cacher.append(&request_spec, solution);
+    }
+    Ok(result)
 }
 
 pub fn get_status_for_date<T: Cacher<String>>(
@@ -124,15 +112,15 @@ fn parse_star_count_from_response(text: String, day: u8) -> Result<u8, Error> {
     return Ok(0);
 }
 
-fn parse_solution_correctness_from_response(response_text: &str) -> Result<Correctness, Error> {
+fn parse_answer_state_from_response_text(response_text: &str) -> Result<AnswerStatus, Error> {
     if response_text.contains("not the right answer") {
-        return Ok(Correctness::IncorrectAnswer);
+        return Ok(AnswerStatus::Correctness(Correctness::Incorrect));
     }
     if response_text.contains("wait") {
-        return Ok(Correctness::TooRecentAnswer);
+        return Ok(AnswerStatus::TooRecent);
     }
     if response_text.contains("right answer") {
-        return Ok(Correctness::CorrectAnswer);
+        return Ok(AnswerStatus::Correctness(Correctness::Correct));
     }
     Err(Error::new(ErrorKind::Configuration {
         message: String::from("Failed to parse submission response text"),
@@ -277,8 +265,12 @@ pub fn output_config(config: &Configuration) -> Result<String, Error> {
     Ok(format!("{:?}", config))
 }
 
-enum Correctness {
-    IncorrectAnswer,
-    TooRecentAnswer,
-    CorrectAnswer,
+pub enum AnswerStatus {
+    Repeated,
+    TooRecent,
+    Correctness(Correctness),
+}
+pub enum Correctness {
+    Incorrect,
+    Correct,
 }

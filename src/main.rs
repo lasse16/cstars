@@ -23,7 +23,23 @@ fn main() -> Result<(), CliError> {
 
     let result: Result<String, Error> = match cli.command {
         cli::Commands::Submit { solution, date } => {
-            lib_cstars::commands::submit_solution_for_date(cacher, client, date.into(), solution)
+            lib_cstars::commands::submit_solution_for_date(cacher, client, date.into(), &solution)
+                .map(|result| match result {
+                    commands::AnswerStatus::Repeated => {
+                        format!("You repeated a previous answer. It was {solution}")
+                    }
+                    commands::AnswerStatus::TooRecent => String::from(
+                        "You gave your last answer too recently; Wait a couple of seconds",
+                    ),
+                    commands::AnswerStatus::Correctness(correct) => match correct {
+                        commands::Correctness::Incorrect => {
+                            format!("Your submitted answer [{solution}] was incorrect")
+                        }
+                        commands::Correctness::Correct => {
+                            format!("Correct answer! Good Job! It was indeed [{solution}]")
+                        }
+                    },
+                })
         }
         cli::Commands::Get { object } => match object {
             cli::GetType::Input { date } => {
