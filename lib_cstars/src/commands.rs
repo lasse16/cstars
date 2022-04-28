@@ -12,8 +12,6 @@ pub fn get_input_for_date<T: Cacher<String>>(
     client: blocking::Client,
     date: Date,
 ) -> Result<String, Error> {
-    log::trace!("Function: input_for_date called; args:  {:?}", &date);
-
     let request_spec = specify_request(&date, RequestType::GetInput);
 
     if let Some(cached_result) = cacher.lookup(&request_spec) {
@@ -46,8 +44,6 @@ pub fn submit_solution_for_date<T: Cacher<String>>(
     date: Date,
     solution: &String,
 ) -> Result<AnswerStatus, Error> {
-    log::trace!("Function: solution_for_date called; args:  {:?}", date);
-
     let request_spec = specify_request(&date, RequestType::PostAnswer);
     if let Some(cached_result) = cacher.lookup(&request_spec) {
         let mut cached_previous_answer_attempts = cached_result.lines();
@@ -101,18 +97,12 @@ pub fn get_description_for_date<T: Cacher<String>>(
     part: u8,
     output_format: OutputFormat,
 ) -> Result<String, Error> {
-    log::trace!("Function: description_for_date called; args:  {:?}", date);
     let request_spec = specify_request(&date, RequestType::GetDescription);
     if let Some(cached_result) = cacher.lookup(&request_spec) {
         return Ok(cached_result);
     }
 
     let response = request_from_url(client, url::build_day_url(&date))?;
-    log::debug!(
-        "Received response {:?} from [{:?}]",
-        response,
-        response.url()
-    );
     if response.status() == reqwest::StatusCode::NOT_FOUND {
         return Err(Error::new(ErrorKind::Command {
             message: format!("Requested description for missing date [ {:?} ]", &date),
