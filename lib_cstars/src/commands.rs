@@ -2,7 +2,7 @@ use crate::shared::{specify_request, AnswerStatus, Date, OutputFormat, RequestTy
 use crate::{
     cache::Cacher,
     configuration::Configuration,
-    errors::{Error, ErrorKind},
+    errors::{CommandErrorKind, Error, ErrorKind},
     html_parsing, url,
 };
 use reqwest::blocking;
@@ -22,7 +22,7 @@ pub fn get_input_for_date<T: Cacher<String>>(
 
     if response.status() == reqwest::StatusCode::NOT_FOUND {
         return Err(Error::new(ErrorKind::Command {
-            message: format!("Requested input for missing date [ {:?} ]", &date),
+            kind: CommandErrorKind::MissingDate(date),
         }));
     }
     let result = response.text()?;
@@ -61,7 +61,7 @@ pub fn submit_solution_for_date<T: Cacher<String>>(
     let response = request.send()?;
     if response.status() == reqwest::StatusCode::NOT_FOUND {
         return Err(Error::new(ErrorKind::Command {
-            message: format!("Submitted solution for missing date [ {:?} ]", &date),
+            kind: CommandErrorKind::MissingDate(date),
         }));
     }
     let response_text = response.text()?;
@@ -105,7 +105,7 @@ pub fn get_description_for_date<T: Cacher<String>>(
     let response = request_from_url(client, url::build_day_url(&date))?;
     if response.status() == reqwest::StatusCode::NOT_FOUND {
         return Err(Error::new(ErrorKind::Command {
-            message: format!("Requested description for missing date [ {:?} ]", &date),
+            kind: CommandErrorKind::MissingDate(date),
         }));
     }
     let response_body = response.text()?;

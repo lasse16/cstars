@@ -1,3 +1,4 @@
+use crate::shared;
 #[derive(Debug)]
 pub struct Error {
     kind: ErrorKind,
@@ -7,7 +8,13 @@ pub struct Error {
 pub enum ErrorKind {
     Configuration { message: String },
     Connection { message: String },
-    Command { message: String },
+    Command { kind: CommandErrorKind },
+}
+
+#[derive(Debug)]
+pub enum CommandErrorKind {
+    MissingDate(shared::Date),
+    UnknownPart(u8),
 }
 
 impl std::error::Error for Error {}
@@ -27,7 +34,7 @@ impl std::fmt::Display for Error {
         match &self.kind {
             ErrorKind::Configuration { message } => write!(f, "configuration error: {}", message),
             ErrorKind::Connection { message } => write!(f, "connection error: {}", message),
-            ErrorKind::Command { message } => write!(f, "command error: {}", message),
+            ErrorKind::Command { kind } => write!(f, "command error: {:?}", kind),
         }
     }
 }

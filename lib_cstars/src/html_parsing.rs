@@ -1,4 +1,4 @@
-use crate::errors::{Error, ErrorKind};
+use crate::errors::{CommandErrorKind, Error, ErrorKind};
 use crate::shared::{AnswerStatus, Correctness};
 use html_editor as parser;
 use parser::operation::{Htmlifiable, Queryable, Selector};
@@ -112,7 +112,7 @@ pub fn select_descriptions_via_part(
         2 => &day_descriptions[1..2],
         _ => {
             return Err(Error::new(ErrorKind::Command {
-                message: format!("Requested an unknown part [ {:?} ]", part),
+                kind: CommandErrorKind::UnknownPart(part),
             }))
         }
     })
