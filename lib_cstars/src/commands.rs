@@ -3,8 +3,7 @@ use crate::{
     cache::Cacher,
     configuration::Configuration,
     errors::{Error, ErrorKind},
-    html_parsing,
-    http::ADVENT_OF_CODE_URL_BASE,
+    html_parsing, url,
 };
 use reqwest::blocking;
 
@@ -20,7 +19,7 @@ pub fn get_input_for_date<T: Cacher<String>>(
         return Ok(cached_result);
     }
 
-    let request = client.get(build_input_url(&date));
+    let request = client.get(url::build_input_url(&date));
     let response = request.send()?;
     if response.status() == reqwest::StatusCode::NOT_FOUND {
         return Err(Error::new(ErrorKind::Command {
@@ -55,7 +54,7 @@ pub fn submit_solution_for_date<T: Cacher<String>>(
 
     let form_params =
         std::collections::hash_map::HashMap::from([("answer", solution.as_str()), ("level", "1")]);
-    let request = client.post(build_answer_url(&date)).form(&form_params);
+    let request = client.post(url::build_answer_url(&date)).form(&form_params);
     let response = request.send()?;
     if response.status() == reqwest::StatusCode::NOT_FOUND {
         return Err(Error::new(ErrorKind::Command {
@@ -80,7 +79,7 @@ pub fn get_status_for_date<T: Cacher<String>>(
         return Ok(cached_result);
     }
 
-    let request = client.get(build_year_url(&date));
+    let request = client.get(url::build_year_url(&date));
     let response = request.send()?;
 
     let star_count: u8 = html_parsing::parse_star_count_from_response(response.text()?, date.day)?;
@@ -102,7 +101,7 @@ pub fn get_description_for_date<T: Cacher<String>>(
         return Ok(cached_result);
     }
 
-    let request = client.get(build_day_url(&date));
+    let request = client.get(url::build_day_url(&date));
     let response = request.send()?;
     log::debug!(
         "Received response {:?} from [{:?}]",
@@ -128,22 +127,6 @@ pub fn get_description_for_date<T: Cacher<String>>(
     let result = converted_descriptions.join("\n");
     cacher.overwrite(&request_spec, &result);
     return Ok(result);
-}
-
-fn build_input_url(date: &Date) -> String {
-    return format!("{}/input", build_day_url(date));
-}
-
-fn build_answer_url(date: &Date) -> String {
-    return format!("{}/answer", build_day_url(date));
-}
-
-fn build_day_url(date: &Date) -> String {
-    return format!("{}/day/{}", build_year_url(date), date.day);
-}
-
-fn build_year_url(date: &Date) -> String {
-    return format!("{ADVENT_OF_CODE_URL_BASE}/{}", date.year);
 }
 
 pub fn output_config(config: &Configuration) -> Result<String, Error> {

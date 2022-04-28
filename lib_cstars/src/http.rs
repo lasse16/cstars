@@ -3,14 +3,13 @@ use secrecy::{ExposeSecret, SecretString};
 use std::process::Command;
 use std::sync::Arc;
 
+use crate::configuration;
 use crate::errors::{Error, ErrorKind};
+use crate::url;
 
-pub const ADVENT_OF_CODE_URL_BASE: &str = "https://adventofcode.com";
-pub fn build_client(
-    config: &crate::configuration::Configuration,
-) -> Result<blocking::Client, Error> {
+pub fn build_client(config: &configuration::Configuration) -> Result<blocking::Client, Error> {
     let cookie_jar = cookie::Jar::default();
-    let url = ADVENT_OF_CODE_URL_BASE.parse::<Url>().expect(
+    let url = url::ADVENT_OF_CODE_URL_BASE.parse::<Url>().expect(
         "Error parsing hardcoded AOC Url; This should never happen, open an issue immediately!",
     );
 
