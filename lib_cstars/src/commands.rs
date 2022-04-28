@@ -15,12 +15,13 @@ pub fn get_input_for_date<T: Cacher<String>>(
     log::trace!("Function: input_for_date called; args:  {:?}", &date);
 
     let request_spec = specify_request(&date, RequestType::GetInput);
+
     if let Some(cached_result) = cacher.lookup(&request_spec) {
         return Ok(cached_result);
     }
 
-    let request = client.get(url::build_input_url(&date));
-    let response = request.send()?;
+    let response = request_from_url(client, url::build_input_url(&date))?;
+
     if response.status() == reqwest::StatusCode::NOT_FOUND {
         return Err(Error::new(ErrorKind::Command {
             message: format!("Requested input for missing date [ {:?} ]", &date),
@@ -31,6 +32,12 @@ pub fn get_input_for_date<T: Cacher<String>>(
     cacher.overwrite(&request_spec, &result);
 
     Ok(result)
+}
+
+fn request_from_url(client: blocking::Client, url: String) -> Result<blocking::Response, Error> {
+    let request = client.get(url);
+    let response = request.send()?;
+    Ok(response)
 }
 
 pub fn submit_solution_for_date<T: Cacher<String>>(
@@ -79,8 +86,7 @@ pub fn get_status_for_date<T: Cacher<String>>(
         return Ok(cached_result);
     }
 
-    let request = client.get(url::build_year_url(&date));
-    let response = request.send()?;
+    let response = request_from_url(client, url::build_year_url(&date))?;
 
     let star_count: u8 = html_parsing::parse_star_count_from_response(response.text()?, date.day)?;
     let result = star_count.to_string();
@@ -101,8 +107,7 @@ pub fn get_description_for_date<T: Cacher<String>>(
         return Ok(cached_result);
     }
 
-    let request = client.get(url::build_day_url(&date));
-    let response = request.send()?;
+    let response = request_from_url(client, url::build_day_url(&date))?;
     log::debug!(
         "Received response {:?} from [{:?}]",
         response,
