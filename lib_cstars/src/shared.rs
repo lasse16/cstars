@@ -39,3 +39,14 @@ pub fn specify_request(date: &Date, request_type: RequestType) -> RequestSpecifi
         request_type,
     };
 }
+
+pub enum AnswerStatus {
+    Repeated,
+    TooRecent,
+    Correctness(Correctness),
+}
+
+pub enum Correctness {
+    Incorrect,
+    Correct,
+}

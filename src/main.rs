@@ -3,6 +3,7 @@ use lib_cstars::commands;
 use lib_cstars::configuration;
 use lib_cstars::errors::Error;
 use lib_cstars::http;
+use lib_cstars::shared;
 
 mod cli;
 mod errors;
@@ -25,17 +26,17 @@ fn main() -> Result<(), CliError> {
         cli::Commands::Submit { solution, date } => {
             lib_cstars::commands::submit_solution_for_date(cacher, client, date.into(), &solution)
                 .map(|result| match result {
-                    commands::AnswerStatus::Repeated => {
+                    shared::AnswerStatus::Repeated => {
                         format!("You repeated a previous answer. It was {solution}")
                     }
-                    commands::AnswerStatus::TooRecent => String::from(
+                    shared::AnswerStatus::TooRecent => String::from(
                         "You gave your last answer too recently; Wait a couple of seconds",
                     ),
-                    commands::AnswerStatus::Correctness(correct) => match correct {
-                        commands::Correctness::Incorrect => {
+                    shared::AnswerStatus::Correctness(correct) => match correct {
+                        shared::Correctness::Incorrect => {
                             format!("Your submitted answer [{solution}] was incorrect")
                         }
-                        commands::Correctness::Correct => {
+                        shared::Correctness::Correct => {
                             format!("Correct answer! Good Job! It was indeed [{solution}]")
                         }
                     },
