@@ -4,18 +4,17 @@ use lib_cstars::configuration;
 use lib_cstars::errors::Error;
 use lib_cstars::http;
 
-
 mod cli;
 mod errors;
 use errors::CliError;
 
 fn main() -> Result<(), CliError> {
-    let config = configuration::parse_configuration(
-        &directories::ProjectDirs::from("", "cstars", "cstars")
-            .unwrap()
-            .config_dir()
-            .join("cstars.toml"),
-    )?;
+    let configuration_path = &directories::ProjectDirs::from("", "cstars", "cstars")
+        .unwrap()
+        .config_dir()
+        .join("cstars.toml");
+
+    let config = configuration::parse_configuration(&configuration_path)?;
     let client = http::build_client(&config)?;
     let cacher = cache::FileBasedCacher::new(&config);
     let cli = cli::parse_cli_arguments()
