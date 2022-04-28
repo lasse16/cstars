@@ -3,7 +3,7 @@ use secrecy::{ExposeSecret, SecretString};
 use std::process::Command;
 use std::sync::Arc;
 
-use crate::errors::Error;
+use crate::errors::{Error, ErrorKind};
 
 pub const ADVENT_OF_CODE_URL_BASE: &str = "https://adventofcode.com";
 pub fn build_client(
@@ -15,9 +15,9 @@ pub fn build_client(
     );
 
     let secret = get_secret(&config.session_cookie_retrieval_command).map_err(|err| {
-        Error::ConfigurationError {
+        Error::new(ErrorKind::Configuration {
             message: format!("Failed to get secret: {:?}", err.to_string()),
-        }
+        })
     })?;
     log::trace!("Retrieved session secret");
 
@@ -26,8 +26,10 @@ pub fn build_client(
     blocking::Client::builder()
         .cookie_provider(Arc::new(cookie_jar))
         .build()
-        .map_err(|err| Error::ConfigurationError {
-            message: err.to_string(),
+        .map_err(|err| {
+            Error::new(ErrorKind::Configuration {
+                message: err.to_string(),
+            })
         })
 }
 

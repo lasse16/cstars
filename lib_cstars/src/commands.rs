@@ -1,6 +1,9 @@
 use crate::shared::{specify_request, Date, OutputFormat, RequestType};
 use crate::{
-    cache::Cacher, configuration::Configuration, errors::Error, http::ADVENT_OF_CODE_URL_BASE,
+    cache::Cacher,
+    configuration::Configuration,
+    errors::{Error, ErrorKind},
+    http::ADVENT_OF_CODE_URL_BASE,
 };
 use html_editor as parser;
 use parser::operation::{Htmlifiable, Queryable, Selector};
@@ -21,9 +24,9 @@ pub fn get_input_for_date<T: Cacher<String>>(
     let request = client.get(build_input_url(&date));
     let response = request.send()?;
     if response.status() == reqwest::StatusCode::NOT_FOUND {
-        return Err(Error::CommandError {
+        return Err(Error::new(ErrorKind::Command {
             message: format!("Requested input for missing date [ {:?} ]", &date),
-        });
+        }));
     }
     let result = response.text()?;
 
@@ -56,9 +59,9 @@ pub fn submit_solution_for_date<T: Cacher<String>>(
     let request = client.post(build_answer_url(&date)).form(&form_params);
     let response = request.send()?;
     if response.status() == reqwest::StatusCode::NOT_FOUND {
-        return Err(Error::CommandError {
+        return Err(Error::new(ErrorKind::Command {
             message: format!("Submitted solution for missing date [ {:?} ]", &date),
-        });
+        }));
     }
     let response_text = response.text()?;
     Ok(
@@ -100,8 +103,10 @@ pub fn get_status_for_date<T: Cacher<String>>(
 }
 
 fn parse_star_count_from_response(text: String, day: u8) -> Result<u8, Error> {
-    let html_tree = parser::parse(&text).map_err(|err| Error::ConnectionError {
-        message: format!("Failed to parse response body: [ {} ]", err),
+    let html_tree = parser::parse(&text).map_err(|err| {
+        Error::new(ErrorKind::Connection {
+            message: format!("Failed to parse response body: [ {} ]", err),
+        })
     })?;
     let selector = Selector::from(format!(".calendar-day{}", day).as_str());
     let day_element = html_tree.query(&selector).unwrap();
@@ -129,9 +134,9 @@ fn parse_solution_correctness_from_response(response_text: &str) -> Result<Corre
     if response_text.contains("right answer") {
         return Ok(Correctness::CorrectAnswer);
     }
-    Err(Error::ConfigurationError {
+    Err(Error::new(ErrorKind::Configuration {
         message: String::from("Failed to parse submission response text"),
-    })
+    }))
 }
 
 pub fn get_description_for_date<T: Cacher<String>>(
@@ -155,9 +160,9 @@ pub fn get_description_for_date<T: Cacher<String>>(
         response.url()
     );
     if response.status() == reqwest::StatusCode::NOT_FOUND {
-        return Err(Error::CommandError {
+        return Err(Error::new(ErrorKind::Command {
             message: format!("Requested description for missing date [ {:?} ]", &date),
-        });
+        }));
     }
     let response_body = response.text()?;
 
@@ -227,9 +232,9 @@ fn select_descriptions_via_part(
         1 => &day_descriptions[0..1],
         2 => &day_descriptions[1..2],
         _ => {
-            return Err(Error::CommandError {
+            return Err(Error::new(ErrorKind::Command {
                 message: format!("Requested an unknown part [ {:?} ]", part),
-            })
+            }))
         }
     })
 }
@@ -242,8 +247,10 @@ fn convert_to_html_descriptions(
 }
 
 fn parse_day_description_from_html(response_body: &str) -> Result<Vec<parser::Element>, Error> {
-    let html_tree = parser::parse(&response_body).map_err(|err| Error::ConnectionError {
-        message: format!("Failed to parse response body: [ {} ]", err),
+    let html_tree = parser::parse(&response_body).map_err(|err| {
+        Error::new(ErrorKind::Connection {
+            message: format!("Failed to parse response body: [ {} ]", err),
+        })
     })?;
     let selector = Selector::from(".day-desc");
     let day_descriptions = html_tree.query_all(&selector);

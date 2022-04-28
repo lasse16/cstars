@@ -3,7 +3,7 @@ use figment::providers::{Format, Toml};
 use serde::{Deserialize, Serialize};
 use std::path::Path;
 
-use crate::errors::Error;
+use crate::errors::{Error, ErrorKind};
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Configuration {
@@ -41,8 +41,10 @@ pub fn parse_configuration(toml_file_location: &Path) -> Result<Configuration, E
     let config: Configuration = figment::Figment::from(default_configuration)
         .merge(Toml::file(toml_file_location))
         .extract()
-        .map_err(|err| Error::ConfigurationError {
-            message: err.to_string(),
+        .map_err(|err| {
+            Error::new(ErrorKind::Configuration {
+                message: err.to_string(),
+            })
         })?;
 
     Ok(config)
