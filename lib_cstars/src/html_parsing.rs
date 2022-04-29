@@ -93,7 +93,7 @@ pub fn convert_to_html_descriptions(
 }
 
 pub fn parse_day_description_from_html(response_body: &str) -> Result<Vec<parser::Element>, Error> {
-    let html_tree = parser::parse(&response_body).map_err(|err| {
+    let html_tree = parser::parse(response_body).map_err(|err| {
         Error::new(ErrorKind::Connection {
             message: format!("Failed to parse response body: [ {} ]", err),
         })

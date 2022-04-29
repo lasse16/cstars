@@ -15,7 +15,7 @@ fn main() -> Result<(), CliError> {
         .config_dir()
         .join("cstars.toml");
 
-    let config = configuration::parse_configuration(&configuration_path)?;
+    let config = configuration::parse_configuration(configuration_path)?;
     let client = http::build_client(&config)?;
     let cacher = cache::FileBasedCacher::new(&config);
     let cli = cli::parse_cli_arguments()
