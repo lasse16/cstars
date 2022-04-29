@@ -47,10 +47,7 @@ pub fn submit_solution_for_date<T: Cacher<String>>(
     let request_spec = specify_request(&date, RequestType::PostAnswer);
     if let Some(cached_result) = cacher.lookup(&request_spec) {
         let mut cached_previous_answer_attempts = cached_result.lines();
-        if cached_previous_answer_attempts
-            .find(|&attempt| attempt == solution)
-            .is_some()
-        {
+        if cached_previous_answer_attempts.any(|attempt| attempt == solution) {
             return Ok(AnswerStatus::Repeated);
         }
     }
