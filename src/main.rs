@@ -66,7 +66,3 @@ fn main() -> Result<(), CliError> {
 fn output_result(result: String) {
     print!("{}", result);
 }
-
-fn output_error(error: Error) {
-    eprint!("{}", error);
-}
