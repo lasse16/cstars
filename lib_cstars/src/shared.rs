@@ -34,10 +34,10 @@ impl core::fmt::Display for RequestType {
 }
 
 pub fn specify_request(date: &Date, request_type: RequestType) -> RequestSpecification {
-    return RequestSpecification {
+    RequestSpecification {
         date: date.clone(),
         request_type,
-    };
+    }
 }
 
 pub enum AnswerStatus {

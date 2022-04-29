@@ -16,10 +16,10 @@ impl Cacher<String> for FileBasedCacher {
     fn lookup(&self, request: &RequestSpecification) -> Option<String> {
         let cached_result_path = self.caching_strategy(request);
         match fs::read_to_string(cached_result_path) {
-            Ok(stored_result) => return Some(stored_result),
+            Ok(stored_result) => Some(stored_result),
             Err(err) => {
                 if err.kind() == std::io::ErrorKind::NotFound {
-                    return None;
+                    None
                 } else {
                     panic!("{:?}", err)
                 }
@@ -47,9 +47,9 @@ impl Cacher<String> for FileBasedCacher {
 
 impl FileBasedCacher {
     pub fn new(config: &configuration::Configuration) -> Self {
-        return FileBasedCacher {
+        FileBasedCacher {
             configuration: config.clone(),
-        };
+        }
     }
 
     fn caching_strategy(&self, request: &RequestSpecification) -> std::path::PathBuf {
@@ -63,6 +63,6 @@ impl FileBasedCacher {
         .iter()
         .collect();
 
-        return file_path;
+        file_path
     }
 }

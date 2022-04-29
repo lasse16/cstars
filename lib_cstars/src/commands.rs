@@ -121,7 +121,7 @@ pub fn get_description_for_date<T: Cacher<String>>(
     }?;
     let result = converted_descriptions.join("\n");
     cacher.overwrite(&request_spec, &result);
-    return Ok(result);
+    Ok(result)
 }
 
 pub fn output_config(config: &Configuration) -> Result<String, Error> {

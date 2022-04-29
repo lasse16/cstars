@@ -22,7 +22,7 @@ pub fn parse_star_count_from_response(text: String, day: u8) -> Result<u8, Error
     if class_attribute.contains("calendar-verycomplete") {
         return Ok(2);
     }
-    return Ok(0);
+    Ok(0)
 }
 
 pub fn parse_answer_state_from_response_text(response_text: &str) -> Result<AnswerStatus, Error> {
@@ -100,7 +100,7 @@ pub fn parse_day_description_from_html(response_body: &str) -> Result<Vec<parser
     })?;
     let selector = Selector::from(".day-desc");
     let day_descriptions = html_tree.query_all(&selector);
-    return Ok(day_descriptions);
+    Ok(day_descriptions)
 }
 pub fn select_descriptions_via_part(
     day_descriptions: &[parser::Element],
