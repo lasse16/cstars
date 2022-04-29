@@ -3,6 +3,15 @@ name = "lib_cstars"
 version = "0.1.0"
 edition = "2021"
 
+authors = ["Lasse Haffke <lasse@haffke.me>"]
+
+description = "Functions and shared content for interacting with the Advent Of Code Website"
+keywords = ["cli", "advent of code", "aoc", "advent_of_code"]
+categories = ["command-line-interface"]
+
+readme = "README.md"
+repository = "https://github.com/lasse16/cstars"
+license = "GPL-3.0-only"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
