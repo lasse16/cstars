@@ -10,6 +10,6 @@ description = "Interact with Advent of Code from the command-line"
 [workspace]
 
 [dependencies]
-lib_cstars = { path = "lib_cstars" }
+lib_cstars = { version = "0.1.0", path = "lib_cstars" }
 clap = { version = "3.1.6", features = ["cargo", "derive"] }
 directories = { version ="4.0.0"}
