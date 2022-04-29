@@ -1,4 +1,6 @@
-# CStars
+<p align="center"><img src="cstar_icon_basic.svg" width="256" height="256" /></p>
+
+<h1 align="center">CStars</h1>
 
 CStars is a CLI tool to interact with 'Advent of Code'. Its name is inspired by the traditional german christmas sweet, cinnamon stars, as well as the awesome phonetic.
 
