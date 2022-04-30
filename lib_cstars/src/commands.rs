@@ -5,7 +5,7 @@
 //! As `client` and `cacher` are intended to be shared across multiple command requests, they need
 //! to be passed into each following function inside this module.
 //! Use this as an option to create them only once and share them throughout the application.
-use crate::shared::{specify_request, AnswerStatus, Date, OutputFormat, RequestType};
+use crate::shared::{specify_request, AnswerStatus, Date, OutputFormat, Part, RequestType};
 use crate::{
     cache::Cacher,
     configuration::Configuration,
@@ -102,10 +102,10 @@ pub fn get_description_for_date<T: Cacher<String>>(
     cacher: T,
     client: blocking::Client,
     date: Date,
-    part: u8,
+    part: Part,
     output_format: OutputFormat,
 ) -> Result<String, Error> {
-    let request_spec = specify_request(&date, RequestType::GetDescription);
+    let request_spec = specify_request(&date, RequestType::GetDescription(Part::Both));
     if let Some(cached_result) = cacher.lookup(&request_spec) {
         return Ok(cached_result);
     }

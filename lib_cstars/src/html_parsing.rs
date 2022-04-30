@@ -1,5 +1,5 @@
-use crate::errors::{CommandErrorKind, Error, ErrorKind};
-use crate::shared::{AnswerStatus, Correctness};
+use crate::errors::{Error, ErrorKind};
+use crate::shared::{AnswerStatus, Correctness, Part};
 use html_editor as parser;
 use parser::operation::{Htmlifiable, Queryable, Selector};
 
@@ -108,16 +108,11 @@ pub fn parse_day_description_from_html(response_body: &str) -> Result<Vec<parser
 
 pub fn select_descriptions_via_part(
     day_descriptions: &[parser::Element],
-    part: u8,
+    part: Part,
 ) -> Result<&[parser::Element], Error> {
     Ok(match part {
-        0 => day_descriptions,
-        1 => &day_descriptions[0..1],
-        2 => &day_descriptions[1..2],
-        _ => {
-            return Err(Error::new(ErrorKind::Command {
-                kind: CommandErrorKind::UnknownPart(part),
-            }))
-        }
+        Part::Both => day_descriptions,
+        Part::First => &day_descriptions[0..1],
+        Part::Second => &day_descriptions[1..2],
     })
 }

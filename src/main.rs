@@ -50,7 +50,7 @@ fn main() -> Result<(), CliError> {
                 cacher,
                 client,
                 date.into(),
-                part,
+                part.into(),
                 output.unwrap_or(cli::CliOutputType::Html).into(),
             ),
             cli::GetType::StarCount { date } => {

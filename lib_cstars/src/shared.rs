@@ -16,7 +16,7 @@ pub struct RequestSpecification {
 
 pub enum RequestType {
     GetInput,
-    GetDescription,
+    GetDescription(Part),
     GetStars,
     PostAnswer,
 }
@@ -25,7 +25,11 @@ impl core::fmt::Display for RequestType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let title: &str = match self {
             RequestType::GetInput => "input",
-            RequestType::GetDescription => "descriptions",
+            RequestType::GetDescription(part) => match part {
+                Part::Both => "descriptions_both",
+                Part::First => "descriptions_first",
+                Part::Second => "descriptions_second",
+            },
             RequestType::GetStars => "stars",
             RequestType::PostAnswer => "answers",
         };
@@ -49,4 +53,20 @@ pub enum AnswerStatus {
 pub enum Correctness {
     Incorrect,
     Correct,
+}
+
+pub enum Part {
+    Both,
+    First,
+    Second,
+}
+impl From<u8> for Part {
+    fn from(part: u8) -> Self {
+        match part {
+            0 => Part::Both,
+            1 => Part::First,
+            2 => Part::Second,
+            _ => panic!(),
+        }
+    }
 }
