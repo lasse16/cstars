@@ -7,6 +7,7 @@ use crate::configuration;
 use crate::errors::{Error, ErrorKind};
 use crate::url;
 
+/// Contruct a html client with added `session` cookie
 pub fn build_client(config: &configuration::Configuration) -> Result<blocking::Client, Error> {
     let cookie_jar = cookie::Jar::default();
     let url = url::ADVENT_OF_CODE_URL_BASE.parse::<Url>().expect(

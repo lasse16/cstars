@@ -3,6 +3,7 @@ use crate::shared::{AnswerStatus, Correctness};
 use html_editor as parser;
 use parser::operation::{Htmlifiable, Queryable, Selector};
 
+/// Parse the star count for a given day from html
 pub fn parse_star_count_from_response(text: String, day: u8) -> Result<u8, Error> {
     let html_tree = parser::parse(&text).map_err(|err| {
         Error::new(ErrorKind::Connection {
@@ -25,6 +26,7 @@ pub fn parse_star_count_from_response(text: String, day: u8) -> Result<u8, Error
     Ok(0)
 }
 
+/// Parse the displayed text on an answer-submission page
 pub fn parse_answer_state_from_response_text(response_text: &str) -> Result<AnswerStatus, Error> {
     if response_text.contains("not the right answer") {
         return Ok(AnswerStatus::Correctness(Correctness::Incorrect));
@@ -40,6 +42,7 @@ pub fn parse_answer_state_from_response_text(response_text: &str) -> Result<Answ
     }))
 }
 
+/// Convert a list of html elements into markdown
 pub fn convert_to_markdown_descriptions(
     selected_day_descriptions: &[parser::Element],
 ) -> Result<Vec<String>, Error> {
@@ -54,7 +57,7 @@ pub fn convert_to_markdown_descriptions(
     }
     Ok(output)
 }
-pub fn convert_node_to_markdown(node: &parser::Node) -> String {
+fn convert_node_to_markdown(node: &parser::Node) -> String {
     match node {
         parser::Node::Element { .. } => convert_html_tag_to_markdown(&node.clone().into_element()),
         parser::Node::Text(text) => text.to_string(),
@@ -63,7 +66,7 @@ pub fn convert_node_to_markdown(node: &parser::Node) -> String {
     }
 }
 
-pub fn convert_html_tag_to_markdown(element: &parser::Element) -> String {
+fn convert_html_tag_to_markdown(element: &parser::Element) -> String {
     let (prefix, postfix) = match &*element.name {
         "p" => ("\n", ""),
         // Necessary whitespace in prefix
@@ -102,6 +105,7 @@ pub fn parse_day_description_from_html(response_body: &str) -> Result<Vec<parser
     let day_descriptions = html_tree.query_all(&selector);
     Ok(day_descriptions)
 }
+
 pub fn select_descriptions_via_part(
     day_descriptions: &[parser::Element],
     part: u8,

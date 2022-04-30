@@ -1,3 +1,10 @@
+//! These are the implemented commands, mirroring the CLI subcommands from CStars
+//!
+//! It is the meat-and-butter of this crate
+//!
+//! As `client` and `cacher` are intended to be shared across multiple command requests, they need
+//! to be passed into each following function inside this module.
+//! Use this as an option to create them only once and share them throughout the application.
 use crate::shared::{specify_request, AnswerStatus, Date, OutputFormat, RequestType};
 use crate::{
     cache::Cacher,
@@ -7,6 +14,7 @@ use crate::{
 };
 use reqwest::blocking;
 
+/// Get the puzzle input for a given date
 pub fn get_input_for_date<T: Cacher<String>>(
     cacher: T,
     client: blocking::Client,
@@ -38,6 +46,7 @@ fn request_from_url(client: blocking::Client, url: String) -> Result<blocking::R
     Ok(response)
 }
 
+/// Post an answer for a given date
 pub fn submit_solution_for_date<T: Cacher<String>>(
     cacher: T,
     client: blocking::Client,
@@ -69,6 +78,7 @@ pub fn submit_solution_for_date<T: Cacher<String>>(
     Ok(result)
 }
 
+/// Get the star count for a specific date
 pub fn get_status_for_date<T: Cacher<String>>(
     cacher: T,
     client: blocking::Client,
@@ -87,6 +97,7 @@ pub fn get_status_for_date<T: Cacher<String>>(
     Ok(result)
 }
 
+/// Get the puzzle description for a specific date
 pub fn get_description_for_date<T: Cacher<String>>(
     cacher: T,
     client: blocking::Client,
@@ -121,6 +132,7 @@ pub fn get_description_for_date<T: Cacher<String>>(
     Ok(result)
 }
 
+/// Print the specified configuration
 pub fn output_config(config: &Configuration) -> Result<String, Error> {
     Ok(format!("{:?}", config))
 }

@@ -2,12 +2,24 @@ use crate::{configuration, shared};
 use shared::RequestSpecification;
 use std::{fs, io::Write};
 
+/// The trait for the cachers used inside this library
+/// `<T>` is used to specify the cached type.
+/// This should be `String` most of the time.
 pub trait Cacher<T> {
+    /// Find some `RequestSpecification` in the Cache.
+    /// Returns `None` if not present else `Some(T)`
     fn lookup(&self, request: &RequestSpecification) -> Option<T>;
+    /// Overwrite the value stored in Chache for `request`
     fn overwrite(&self, request: &RequestSpecification, storage: &T);
+    /// Append the value stored in Chache for `request`
+    /// Make sure to properly parse the `lookup` result if you are storing more than one value per
+    /// `request`
     fn append(&self, request: &RequestSpecification, storage: &T);
 }
 
+/// A file-based implementation of the `Cacher<String>` type.
+///
+/// Cached results are written to files.
 pub struct FileBasedCacher {
     configuration: configuration::Configuration,
 }
@@ -46,6 +58,7 @@ impl Cacher<String> for FileBasedCacher {
 }
 
 impl FileBasedCacher {
+    /// Create a new `FileBasedCacher` with a given configuration
     pub fn new(config: &configuration::Configuration) -> Self {
         FileBasedCacher {
             configuration: config.clone(),

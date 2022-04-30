@@ -5,9 +5,12 @@ use std::path::Path;
 
 use crate::errors::{Error, ErrorKind};
 
+///Store configuration options for CStars
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Configuration {
+    /// Shell command used to retrieve the `session` cookie for Advent of Code
     pub session_cookie_retrieval_command: String,
+    /// Directory to set the cache up in
     pub cache_dir: std::path::PathBuf,
 }
 
@@ -36,6 +39,7 @@ impl figment::Provider for Configuration {
     }
 }
 
+/// Parse a `toml` configuration file at `toml_file_path`
 pub fn parse_configuration(toml_file_location: &Path) -> Result<Configuration, Error> {
     let default_configuration = Configuration::default();
     let config: Configuration = figment::Figment::from(default_configuration)
