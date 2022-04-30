@@ -53,6 +53,7 @@ pub enum GetType {
     Description {
         #[clap(flatten)]
         date: CliArgsDate,
+        part: u8,
         output: Option<CliOutputType>,
     },
 }

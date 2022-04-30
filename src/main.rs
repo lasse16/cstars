@@ -46,11 +46,11 @@ fn main() -> Result<(), CliError> {
             cli::GetType::Input { date } => {
                 commands::get_input_for_date(cacher, client, date.into())
             }
-            cli::GetType::Description { output, date } => commands::get_description_for_date(
+            cli::GetType::Description { output, date, part } => commands::get_description_for_date(
                 cacher,
                 client,
                 date.into(),
-                0,
+                part,
                 output.unwrap_or(cli::CliOutputType::Html).into(),
             ),
             cli::GetType::StarCount { date } => {
