@@ -29,8 +29,8 @@ fn main() -> Result<(), CliError> {
                     shared::AnswerStatus::Repeated => {
                         format!("You repeated a previous answer. It was {solution}")
                     }
-                    shared::AnswerStatus::TooRecent => String::from(
-                        "You gave your last answer too recently; Wait a couple of seconds",
+                    shared::AnswerStatus::TooRecent(wait_time) => format!(
+                        "You gave your last answer too recently; Wait {} seconds before submitting your next answer!",wait_time.as_secs()
                     ),
                     shared::AnswerStatus::Correctness(correct) => match correct {
                         shared::Correctness::Incorrect => {

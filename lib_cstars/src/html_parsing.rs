@@ -1,3 +1,6 @@
+use regex;
+use std::time;
+
 use crate::errors::{Error, ErrorKind};
 use crate::shared::{AnswerStatus, Correctness, Part};
 use html_editor as parser;
@@ -32,7 +35,8 @@ pub fn parse_answer_state_from_response_text(response_text: &str) -> Result<Answ
         return Ok(AnswerStatus::Correctness(Correctness::Incorrect));
     }
     if response_text.contains("wait") {
-        return Ok(AnswerStatus::TooRecent);
+        let wait_time: time::Duration = parse_wait_time(response_text);
+        return Ok(AnswerStatus::TooRecent(wait_time));
     }
     if response_text.contains("right answer") {
         return Ok(AnswerStatus::Correctness(Correctness::Correct));
@@ -40,6 +44,20 @@ pub fn parse_answer_state_from_response_text(response_text: &str) -> Result<Answ
     Err(Error::new(ErrorKind::Configuration {
         message: String::from("Failed to parse submission response text"),
     }))
+}
+
+fn parse_wait_time(response_text: &str) -> time::Duration {
+    // "You have 4m 51s left to wait"
+    let regex_string =
+        regex::Regex::new(r#"You have ((?P<minutes>\d+)m )??(?P<seconds>\d+)s left to wait"#)
+            .unwrap();
+    let captures = regex_string.captures(response_text).unwrap();
+    let minutes: u64 = match captures.name("minutes") {
+        Some(captured) => captured.as_str().parse().unwrap(),
+        None => 0,
+    };
+    let seconds: u64 = captures.name("seconds").unwrap().as_str().parse().unwrap();
+    time::Duration::new(seconds + (minutes * 60), 0)
 }
 
 /// Convert a list of html elements into markdown

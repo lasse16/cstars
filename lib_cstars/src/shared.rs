@@ -46,7 +46,7 @@ pub fn specify_request(date: &Date, request_type: RequestType) -> RequestSpecifi
 
 pub enum AnswerStatus {
     Repeated,
-    TooRecent,
+    TooRecent(std::time::Duration),
     Correctness(Correctness),
 }
 
