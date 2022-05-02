@@ -5,7 +5,7 @@ edition = "2021"
 authors = ["Lasse Haffke <lasse@haffke.me>"]
 
 description = "Interact with Advent of Code from the command-line"
-keywords = ["cli", "advent of code", "aoc", "advent_of_code"]
+keywords = ["cli",  "aoc", "advent_of_code"]
 categories = ["command-line-utilities"]
 
 readme = "README.md"
